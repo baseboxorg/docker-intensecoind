@@ -22,7 +22,7 @@ RUN git clone https://github.com/valiant1x/intensecoin.git $SRC_DIR
 WORKDIR $SRC_DIR
 RUN make -j$(nproc)
 
-RUN cp $SRC_DIR/build/release/src/{connectivity_tool,intensecoind,miner,simplewallet,walletd} /usr/local/bin/ \
+RUN cp build/release/src/connectivity_tool build/release/src/intensecoind build/release/src/miner build/release/src/simplewallet build/release/src/walletd /usr/local/bin/ \
   && rm -r $SRC_DIR \
   && apt-get -qq --auto-remove purge $buildDeps
 

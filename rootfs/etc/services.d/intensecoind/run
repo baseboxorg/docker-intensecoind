@@ -1,0 +1,36 @@
+#!/usr/bin/with-contenv bash
+
+if [ -z "$LOG_LEVEL" ]; then
+      LOG_LEVEL=2
+fi
+
+if [ -z "$P2P_BIND_IP" ]; then
+      P2P_BIND_IP=0.0.0.0
+fi
+
+if [ -z "$P2P_BIND_PORT" ]; then
+      P2P_BIND_PORT=48772
+fi
+
+if [ -z "$RPC_BIND_IP" ]; then
+      RPC_BIND_IP=127.0.0.1
+fi
+
+if [ -z "$RPC_BIND_PORT" ]; then
+      RPC_BIND_PORT=48782
+fi
+
+if [ -z "$DAEMON_EXTRA_ARGS" ]; then
+      DAEMON_EXTRA_ARGS=
+fi
+
+echo "Starting intensecoind with:"
+echo "  LOG_LEVEL:         $LOG_LEVEL"
+echo "  P2P_BIND_IP:       $P2P_BIND_IP"
+echo "  P2P_BIND_PORT:     $P2P_BIND_PORT"
+echo "  RPC_BIND_IP:       $RPC_BIND_IP"
+echo "  RPC_BIND_PORT:     $RPC_BIND_PORT"
+echo "  DAEMON_EXTRA_ARGS: $DAEMON_EXTRA_ARGS"
+echo ""
+
+exec intensecoind --log-level=$LOG_LEVEL --p2p-bind-ip=$P2P_BIND_IP --p2p-bind-port=$P2P_BIND_PORT --rpc-bind-ip=$RPC_BIND_IP --rpc-bind-port=$RPC_BIND_PORT --no-console $DAEMON_EXTRA_ARGS

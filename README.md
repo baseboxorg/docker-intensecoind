@@ -1,0 +1,110 @@
+# IntenseCoin Node via Docker
+
+Visit the [official IntenseCoin website](https://intensecoin.com/) to find out what it's all about.
+
+- Based on Ubuntu image
+- Using s6-overlay for process management
+- Builds daemon and wallet binaries from source
+
+## Up and running
+
+With docker-compose:
+
+```yml
+version: "2"
+services:
+  app:
+    image: jc21/intensecoind
+    ports:
+      - 48782:48782
+      - 48772:48772
+    volumes:
+      - "./data/node:/root/.intensecoin"
+      - "./data/wallet:/wallet"
+```
+
+With docker vanilla:
+
+```bash
+docker run --detach \
+    --name intensecoind \
+    -p 48782:48782 \
+    -p 48772:48772 \
+    -v /path/to/blockchain:/root/.intensecoin \
+    -v /path/to/wallet:/wallet \
+    jc21/intensecoind
+```
+
+## Daemon variables
+
+Using environment variables passed to the container you can override some defaults for the daemon:
+
+| Variable            | Default       |
+| ------------------- | ------------- |
+| `LOG_LEVEL`         | `2`           |
+| `P2P_BIND_IP`       | `0.0.0.0`     |
+| `P2P_BIND_PORT`     | `48772`       |
+| `RPC_BIND_IP`       | `127.0.0.1`   |
+| `RPC_BIND_PORT`     | `48782`       |
+| `DAEMON_EXTRA_ARGS` |               |
+
+You would specify them like so:
+
+```yml
+version: "2"
+services:
+  app:
+    image: jc21/intensecoind
+    ports:
+      - 48782:48782
+      - 48772:48772
+    environment:
+      - RPC_BIND_IP=0.0.0.0
+      - DAEMON_EXTRA_ARGS=--confirm-external-bind
+    volumes:
+      - "./data/node:/root/.intensecoin"
+      - "./data/wallet:/wallet"
+```
+
+Or:
+
+```bash
+docker run --detach \
+    --name intensecoind \
+    -p 48782:48782 \
+    -p 48772:48772 \
+    -e RPC_BIND_IP=0.0.0.0 \
+    -e DAEMON_EXTRA_ARGS=--confirm-external-bind \
+    -v /path/to/blockchain:/root/.intensecoin \
+    -v /path/to/wallet:/wallet \
+    jc21/intensecoind
+```
+
+`DAEMON_EXTRA_ARGS` is for advanced users who might want to get very specific with the daemon arguments.
+
+You can follow the logs of the daemon with:
+
+```bash
+docker-compose logs -f app
+```
+
+Or:
+
+```bash
+docker logs -f intensecoind
+```
+
+
+## Wallet Access
+
+When the docker daemon is running and in sync with the network, you can use the built in wallet-cli command:
+
+```bash
+docker-compose exec app /bin/bash -c 'cd /wallet && simplewallet'
+```
+
+Or:
+
+```bash
+docker exec -ti intensecoind /bin/bash -c 'cd /wallet && simplewallet'
+```

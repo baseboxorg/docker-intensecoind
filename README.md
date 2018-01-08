@@ -1,5 +1,8 @@
 # IntenseCoin Node via Docker
 
+![Stars](https://img.shields.io/docker/stars/jc21/intensecoind.svg)
+![Pulls](https://img.shields.io/docker/pulls/jc21/intensecoind.svg)
+
 Visit the [official IntenseCoin website](https://intensecoin.com/) to find out what it's all about.
 
 - Based on Ubuntu image

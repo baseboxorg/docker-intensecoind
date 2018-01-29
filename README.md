@@ -9,6 +9,9 @@ Visit the [official IntenseCoin website](https://intensecoin.com/) to find out w
 - Using s6-overlay for process management
 - Builds daemon and wallet binaries from source
 
+**Note:** I don't keep track of [upstream code](https://github.com/valiant1x/intensecoin) changes so if you find my docker build is out of date, open a issue here on Github and I'll fire off a new build.
+
+
 ## Up and running
 
 With docker-compose:

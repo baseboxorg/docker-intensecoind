@@ -43,7 +43,7 @@ docker run --detach \
 
 ## Using [Rancher](https://rancher.com)?
 
-Easily start an Electroneum Node Stack by adding [my template catalog](https://github.com/jc21/rancher-templates).
+Easily start an Intense Coin Node Stack by adding [my template catalog](https://github.com/jc21/rancher-templates).
 
 
 ## Daemon variables

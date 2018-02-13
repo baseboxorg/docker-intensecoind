@@ -66,7 +66,6 @@ services:
       - 48772:48772
     environment:
       - RPC_BIND_IP=0.0.0.0
-      - DAEMON_EXTRA_ARGS=--confirm-external-bind
     volumes:
       - "./data/node:/root/.intensecoin"
       - "./data/wallet:/wallet"
@@ -80,7 +79,6 @@ docker run --detach \
     -p 48782:48782 \
     -p 48772:48772 \
     -e RPC_BIND_IP=0.0.0.0 \
-    -e DAEMON_EXTRA_ARGS=--confirm-external-bind \
     -v /path/to/blockchain:/root/.intensecoin \
     -v /path/to/wallet:/wallet \
     jc21/intensecoind

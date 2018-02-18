@@ -18,7 +18,7 @@ RUN set -x \
   && apt-get -qq update \
   && apt-get -qq --no-install-recommends install $buildDeps
 
-RUN git clone https://github.com/valiant1x/intensecoin.git $SRC_DIR
+RUN git clone https://github.com/valiant1x/intensecoin.git $SRC_DIR && cd $SRC_DIR && git checkout tags/1.4.2
 WORKDIR $SRC_DIR
 RUN make -j$(nproc)
 

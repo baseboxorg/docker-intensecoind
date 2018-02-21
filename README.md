@@ -103,6 +103,10 @@ Or:
 docker logs -f intensecoind
 ```
 
+**Important Note:**
+
+If you are specifying a non-local `RPC_BIND_IP` then you **must** specify `--confirm-external-bind` as extra arguments.
+
 
 ## Wallet Access
 

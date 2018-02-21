@@ -52,7 +52,7 @@ Using environment variables passed to the container you can override some defaul
 
 | Variable            | Default       |
 | ------------------- | ------------- |
-| `LOG_LEVEL`         | `2`           |
+| `LOG_LEVEL`         | `0`           |
 | `P2P_BIND_IP`       | `0.0.0.0`     |
 | `P2P_BIND_PORT`     | `48772`       |
 | `RPC_BIND_IP`       | `127.0.0.1`   |
@@ -109,11 +109,11 @@ docker logs -f intensecoind
 When the docker daemon is running and in sync with the network, you can use the built in wallet-cli command:
 
 ```bash
-docker-compose exec app /bin/bash -c 'cd /wallet && simplewallet'
+docker-compose exec app /bin/bash -c 'cd /wallet && intense-wallet-cli'
 ```
 
 Or:
 
 ```bash
-docker exec -ti intensecoind /bin/bash -c 'cd /wallet && simplewallet'
+docker exec -ti intensecoind /bin/bash -c 'cd /wallet && intense-wallet-cli'
 ```

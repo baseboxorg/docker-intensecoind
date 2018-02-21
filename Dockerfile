@@ -1,37 +1,27 @@
 FROM ubuntu:16.04
 
 ENV S6_FIX_ATTRS_HIDDEN=1
-ENV SRC_DIR /usr/local/src/intensecoin
+ENV TMP_DIR /tmp/intensecoin
 RUN echo "fs.file-max = 65535" > /etc/sysctl.conf
 
-RUN set -x \
-  && buildDeps=' \
-      ca-certificates \
-      cmake \
-      g++ \
-      git \
-      libboost1.58-all-dev \
-      libssl-dev \
-      make \
-      pkg-config \
-  ' \
-  && apt-get -qq update \
-  && apt-get -qq --no-install-recommends install $buildDeps
+RUN apt-get -qq update \
+  && apt-get -qq --no-install-recommends install wget ca-certificates libboost1.58-all-dev xz-utils
 
-RUN git clone -b xmr --single-branch https://github.com/valiant1x/intensecoin.git $SRC_DIR --depth 1
-WORKDIR $SRC_DIR
-RUN make -j$(nproc)
-
-RUN cp build/release/src/connectivity_tool build/release/src/intensecoind build/release/src/miner build/release/src/simplewallet build/release/src/walletd /usr/local/bin/ \
-  && rm -r $SRC_DIR \
-  && apt-get -qq --auto-remove purge $buildDeps
+RUN mkdir -p $TMP_DIR \
+  && cd $TMP_DIR \
+  && wget "https://github.com/valiant1x/intensecoin/releases/download/1.4.4/Intensecoin-daemon-linux-x86_64.tar.xz" \
+  && tar xf Intensecoin-daemon-linux-x86_64.tar.xz \
+  && rm -f Intensecoin-daemon-linux-x86_64.tar.xz \
+  && chmod +x * \
+  && mv * /usr/local/bin/ \
+  && rm -rf $TMP_DIR
 
 # Contains the blockchain
 VOLUME /root/.intensecoin
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
-# simplewallet
+# intense-wallet-cli
 VOLUME /wallet
 
 EXPOSE 48782

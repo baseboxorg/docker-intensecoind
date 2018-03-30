@@ -7,6 +7,7 @@ RUN echo "fs.file-max = 65535" > /etc/sysctl.conf
 RUN set -x \
   && buildDeps=' \
       ca-certificates \
+      build-essential \
       cmake \
       g++ \
       git \
@@ -14,15 +15,18 @@ RUN set -x \
       libssl-dev \
       make \
       pkg-config \
+      libunbound-dev \
   ' \
   && apt-get -qq update \
   && apt-get -qq --no-install-recommends install $buildDeps
 
-RUN git clone https://github.com/valiant1x/intensecoin.git $SRC_DIR && cd $SRC_DIR && git checkout tags/v1.45
+RUN git clone https://github.com/valiant1x/intensecoin.git $SRC_DIR
 WORKDIR $SRC_DIR
-RUN make -j$(nproc)
+RUN git checkout master
 
-RUN cp build/release/src/connectivity_tool build/release/src/intensecoind build/release/src/miner build/release/src/simplewallet build/release/src/walletd /usr/local/bin/ \
+RUN make -j$(nproc) release-static
+
+RUN cp build/release/bin/* /usr/local/bin/ \
   && rm -r $SRC_DIR \
   && apt-get -qq --auto-remove purge $buildDeps
 
@@ -33,6 +37,7 @@ VOLUME /root/.intensecoin
 # cd /wallet
 # simplewallet
 VOLUME /wallet
+
 
 EXPOSE 48782
 EXPOSE 48772

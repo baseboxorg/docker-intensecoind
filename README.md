@@ -86,9 +86,7 @@ docker run --detach \
     -p 48782:48782 \
     -p 48772:48772 \
     -e RPC_BIND_IP=0.0.0.0 \
-    -v /path/to/blockchain:/root/.intensecoin \
-    -v /path/to/wallet:/wallet \
-    jc21/intensecoind
+    baseboxorg/intensecoind
 ```
 
 `DAEMON_EXTRA_ARGS` is for advanced users who might want to get very specific with the daemon arguments.

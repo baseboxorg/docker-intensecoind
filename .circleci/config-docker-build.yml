@@ -1,0 +1,66 @@
+IMAGE_NAME: dotfiles
+
+version: 2
+jobs:
+  build:
+    context: DOCKER_HUB
+    working_directory: /root/.dotfiles/src
+    docker:
+      - image: docker:18.03.0-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache \
+              py-pip=9.0.1-r1
+            pip install \
+              --upgrade pip
+            pip install \
+              docker-compose==1.20.1 \
+              awscli==1.14.66
+      - restore_cache:
+          keys:
+            - v1-{{ .Branch }}
+          paths:
+            - /caches/dotfiles.tar
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i /caches/dotfiles.tar | true
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build --cache-from=dotfiles -t dotfiles .
+      - run:
+          name: Save Docker image layer cache
+          command: |
+            mkdir -p /caches
+            docker save -o /caches/dotfiles.tar dotfiles
+      - save_cache:
+          key: v1-{{ .Branch }}-{{ epoch }}
+          paths:
+            - /caches/dotfiles.tar
+      - run:
+          name: Run tests
+          command: |
+            docker-compose -f ./docker-compose.test.yml up
+      - deploy:
+          name: Push application Docker image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+              docker tag dotfiles "${DOCKER_USER}/dotfiles:${CIRCLE_SHA1}"
+              docker tag dotfiles "${DOCKER_USER}/dotfiles:latest"
+              docker push "${DOCKER_USER}/dotfiles:${CIRCLE_SHA1}"
+              docker push "${DOCKER_USER}/dotfiles:latest"
+            fi
+
+workflows:
+  version: 2
+  dotfiles:
+    jobs:
+      - build:
+          context: DOCKER_HUB

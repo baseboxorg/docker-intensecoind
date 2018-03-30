@@ -1,0 +1,66 @@
+version: 2
+jobs:
+  build:
+    context: PJ_DOTFILES
+    docker:
+      - image: baseboxorg/docker-circleci
+    #working_directory: /root/.${DOCKER_IMAGE}/src
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - restore_cache:
+          keys:
+            - v1-{{ .Branch }}
+          paths:
+            - /caches/${COMPOSE_IMAGE}.tar
+            - /caches/${COMPOSE_DATA}.tar
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i /caches/${COMPOSE_IMAGE}.tar | true
+            docker load -i /caches/${COMPOSE_DATA}.tar | true
+      - run:
+          name: Build the image(s) from compose
+          command: |
+            docker-compose up --build
+
+      - run:
+          name: Save Docker image layer cache
+          command: |
+            mkdir -p /caches
+            docker save -o /caches/${COMPOSE_IMAGE}.tar ${COMPOSE_IMAGE}
+            docker save -o /caches/${COMPOSE_DATA}.tar ${COMPOSE_DATA}
+      - save_cache:
+          key: v1-{{ .Branch }}-{{ epoch }}
+          paths:
+            - /caches/${COMPOSE_IMAGE}.tar
+            - /caches/${COMPOSE_DATA}.tar
+
+      - run:
+          name: Test(s) the image(s) from compose
+          command: |
+            docker-compose -f ./docker-compose.test.yml up
+
+      - run:
+          name: Deploy freshly built image(s) to Docker Hub
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+              docker tag ${COMPOSE_IMAGE} "${DOCKER_USER}/${DOCKER_IMAGE}:${CIRCLE_SHA1}"
+              docker tag ${COMPOSE_IMAGE} "${DOCKER_USER}/${DOCKER_IMAGE}:xenial"
+              docker tag ${COMPOSE_IMAGE} "${DOCKER_USER}/${DOCKER_IMAGE}:latest"
+
+              docker tag ${COMPOSE_DATA} "${DOCKER_USER}/${DOCKER_DATA}:${CIRCLE_SHA1}"
+              docker tag ${COMPOSE_DATA} "${DOCKER_USER}/${DOCKER_DATA}:xenial"
+              docker tag ${COMPOSE_DATA} "${DOCKER_USER}/${DOCKER_DATA}:latest"
+
+              docker push "${DOCKER_USER}/${DOCKER_IMAGE}:${CIRCLE_SHA1}"
+              docker push "${DOCKER_USER}/${DOCKER_IMAGE}:xenial"
+              docker push "${DOCKER_USER}/${DOCKER_IMAGE}:latest"
+
+              docker push "${DOCKER_USER}/${DOCKER_DATA}:${CIRCLE_SHA1}"
+              docker push "${DOCKER_USER}/${DOCKER_DATA}:xenial"
+              docker push "${DOCKER_USER}/${DOCKER_DATA}:latest"
+            fi

@@ -1,0 +1,31 @@
+version: 2
+jobs:
+  build:
+    context: DOCKER_HUB
+    docker:
+      - image: baseboxorg/docker-circleci
+    #working_directory: /root/.dotfiles/src
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - run:
+          name: Compose to build the image(s)
+          command: |
+            docker-compose build
+
+      - run:
+          name: Compose to run test(s)
+          command: |
+            docker-compose -f ./docker-compose.test.yml up
+
+      - deploy:
+          name: Push freshly built image(s) to Docker Hub
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+              docker tag dotfiles "${DOCKER_USER}/dotfiles:${CIRCLE_SHA1}"
+              docker tag dotfiles "${DOCKER_USER}/dotfiles:latest"
+              docker push "${DOCKER_USER}/dotfiles:${CIRCLE_SHA1}"
+              docker push "${DOCKER_USER}/dotfiles:latest"
+            fi

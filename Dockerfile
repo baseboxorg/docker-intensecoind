@@ -51,3 +51,4 @@ RUN apt-get -y install curl && curl -L -s https://github.com/just-containers/s6-
     | tar xzf - -C /
 
 ENTRYPOINT [ "/init" ]
+CMD ["/bin/bash"]

@@ -33,4 +33,4 @@ echo "  RPC_BIND_PORT:     $RPC_BIND_PORT"
 echo "  DAEMON_EXTRA_ARGS: $DAEMON_EXTRA_ARGS"
 echo ""
 
-exec intensecoind --log-level=$LOG_LEVEL --p2p-bind-ip=$P2P_BIND_IP --p2p-bind-port=$P2P_BIND_PORT --rpc-bind-ip=$RPC_BIND_IP --rpc-bind-port=$RPC_BIND_PORT --no-console $DAEMON_EXTRA_ARGS
+exec intensecoind --log-level=$LOG_LEVEL --p2p-bind-ip=$P2P_BIND_IP --p2p-bind-port=$P2P_BIND_PORT --rpc-bind-ip=$RPC_BIND_IP --rpc-bind-port=$RPC_BIND_PORT $DAEMON_EXTRA_ARGS

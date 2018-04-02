@@ -12,7 +12,7 @@ RUN set -x \
       make \
       pkg-config ' \
   && apt-get -qq update \
-  && apt-get -qq --no-install-recommends install apt-transport-https ca-certificates wget $buildDeps
+  && apt-get -qq --no-install-recommends install apt-transport-https ca-certificates wget libminiupnpc-dev $buildDeps
 
 RUN git clone https://github.com/valiant1x/intensecoin.git $SRC_DIR
 WORKDIR $SRC_DIR

@@ -1,13 +1,10 @@
 FROM ubuntu:16.04
 
-ENV S6_FIX_ATTRS_HIDDEN=1
-ENV SRC_DIR /usr/local/src/intensecoin
-RUN echo "fs.file-max = 65535" > /etc/sysctl.conf
+ENV SRC_DIR /app
 
 RUN set -x \
   && buildDeps=' \
       ca-certificates \
-      build-essential \
       cmake \
       g++ \
       git \
@@ -15,7 +12,6 @@ RUN set -x \
       libssl-dev \
       make \
       pkg-config \
-      libunbound-dev \
   ' \
   && apt-get -qq update \
   && apt-get -qq --no-install-recommends install $buildDeps
@@ -23,10 +19,11 @@ RUN set -x \
 RUN git clone https://github.com/valiant1x/intensecoin.git $SRC_DIR
 WORKDIR $SRC_DIR
 RUN git checkout master
-
+# checkout is temporary until master is also xmr source
 RUN make -j$(nproc) release-static
 
 RUN cp build/release/bin/* /usr/local/bin/ \
+  \
   && rm -r $SRC_DIR \
   && apt-get -qq --auto-remove purge $buildDeps
 
@@ -35,20 +32,16 @@ VOLUME /root/.intensecoin
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
-# simplewallet
+# intense-wallet-cli
 VOLUME /wallet
 
+ENV LOG_LEVEL 0
+ENV P2P_BIND_IP 0.0.0.0
+ENV P2P_BIND_PORT 48772
+ENV RPC_BIND_IP 127.0.0.1
+ENV RPC_BIND_PORT 48782
 
 EXPOSE 48782
 EXPOSE 48772
 
-WORKDIR /root
-
-# S6 Overlay
-COPY rootfs /
-ADD env/.bashrc /root/
-RUN apt-get -y install curl && curl -L -s https://github.com/just-containers/s6-overlay/releases/download/v1.21.2.1/s6-overlay-amd64.tar.gz \
-    | tar xzf - -C /
-
-ENTRYPOINT [ "/init" ]
-CMD ["/bin/bash"]
+CMD intensecoind --log-level=$LOG_LEVEL --p2p-bind-ip=$P2P_BIND_IP --p2p-bind-port=$P2P_BIND_PORT --rpc-bind-ip=$RPC_BIND_IP --rpc-bind-port=$RPC_BIND_PORT

@@ -4,17 +4,15 @@ ENV SRC_DIR /app
 
 RUN set -x \
   && buildDeps=' \
-      ca-certificates \
       cmake \
       g++ \
       git \
       libboost1.58-all-dev \
       libssl-dev \
       make \
-      pkg-config \
-  ' \
+      pkg-config ' \
   && apt-get -qq update \
-  && apt-get -qq --no-install-recommends install $buildDeps
+  && apt-get -qq --no-install-recommends install apt-transport-https ca-certificates wget $buildDeps
 
 RUN git clone https://github.com/valiant1x/intensecoin.git $SRC_DIR
 WORKDIR $SRC_DIR
@@ -23,17 +21,16 @@ RUN git checkout master
 RUN make -j$(nproc) release-static
 
 RUN cp build/release/bin/* /usr/local/bin/ \
-  \
   && rm -r $SRC_DIR \
   && apt-get -qq --auto-remove purge $buildDeps
 
 # Contains the blockchain
-VOLUME /root/.intensecoin
+VOLUME /app/.intensecoin
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
 # intense-wallet-cli
-VOLUME /wallet
+VOLUME /app/wallet
 
 ENV LOG_LEVEL 0
 ENV P2P_BIND_IP 0.0.0.0
